@@ -1,0 +1,25 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Admin Panel</title>
+<style>
+body{font-family:Arial;background:#f3f6fb;margin:0}.top{background:#123e91;color:#fff;padding:18px 28px}.wrap{padding:22px}
+.card{background:#fff;border-radius:14px;padding:18px;margin-bottom:20px;box-shadow:0 3px 14px #0001}
+table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid #eee;text-align:left}
+button{padding:7px 11px;border:0;border-radius:7px;background:#1457d9;color:#fff}.bad{background:#c62828}.ok{background:#1b7f3b}
+input,textarea{padding:8px;margin:4px}textarea{width:95%;min-height:100px}
+</style></head><body><div class="top"><h2>CBSE PAPER MAKER — ADMIN CONTROL</h2><div>Admin: Unlimited Papers</div></div><div class="wrap">
+<div class="card"><h3>Pending / All Payments</h3><table><tr><th>User</th><th>₹</th><th>Credits</th><th>Order</th><th>UTR</th><th>Status</th><th>Action</th></tr>
+{% for p in payments %}<tr><td>{{p.user_id}}</td><td>{{p.amount}}</td><td>{{p.credits}}</td><td>{{p.order_ref}}</td><td>{{p.utr}}</td><td>{{p.status}}</td><td>
+{% if p.status=="PENDING" and p.utr %}
+<form style="display:inline" method="post" action="/admin/payment/{{p.id}}/approve"><button class="ok">Approve</button></form>
+<form style="display:inline" method="post" action="/admin/payment/{{p.id}}/reject"><button class="bad">Reject</button></form>
+{% endif %}</td></tr>{% endfor %}</table></div>
+<div class="card"><h3>Teachers / Credits</h3><table><tr><th>ID</th><th>Mobile</th><th>Name</th><th>Credits</th><th>Active</th><th>Control</th></tr>
+{% for u in users %}<tr><td>{{u.id}}</td><td>{{u.mobile}}</td><td>{{u.name}}</td><td>{% if u.is_admin %}UNLIMITED{% else %}{{u.credits}}{% endif %}</td><td>{{u.is_active}}</td><td>
+{% if not u.is_admin %}
+<form style="display:inline" method="post" action="/admin/user/{{u.id}}/credits"><input name="amount" type="number" value="1" style="width:55px"><button>Add/Remove</button></form>
+<form style="display:inline" method="post" action="/admin/user/{{u.id}}/toggle"><button class="bad">Enable/Disable</button></form>
+{% endif %}</td></tr>{% endfor %}</table></div>
+<div class="card"><h3>CBSE Default Syllabus Update</h3>
+<form method="post" action="/admin/syllabus"><input name="class_name" placeholder="Class e.g. 10" required>
+<input name="subject_key" placeholder="Subject code/name e.g. 165" required><br>
+<textarea name="text" placeholder="Paste official CBSE syllabus / included chapters here" required></textarea><br><button>Save Syllabus</button></form></div>
+</div></body></html>

@@ -268,7 +268,8 @@ Rules:
         text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text)
         obj = json.loads(text)
         return obj["question_paper"], obj["answer_key"]
-    except Exception:
+    except Exception as e:
+        print("GEMINI ERROR:", repr(e), flush=True)
         return fallback_paper(x, syllabus)
 
 @app.post("/papers/generate")
@@ -276,7 +277,7 @@ def generate(x: PaperIn, u: User = Depends(current_user), s: Session = Depends(d
     if x.max_marks < 10 or x.max_marks > 200:
         raise HTTPException(400, "Maximum marks must be between 10 and 200")
     if not u.is_admin and u.credits <= 0:
-        raise HTTPException(402, "No paper credits. Buy ₹10 or ₹20 plan.")
+        raise HTTPException(402, "No paper credits. Buy Ã¢â€šÂ¹10 or Ã¢â€šÂ¹20 plan.")
     syllabus, use_search = syllabus_context(x, s)
     qp, ak = gemini_generate(x, syllabus, use_search)
     title = f"Class {x.class_name} {x.subject} {x.exam_type}"
